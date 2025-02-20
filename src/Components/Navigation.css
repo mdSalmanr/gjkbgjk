@@ -1,0 +1,12 @@
+.navigation{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px;
+    border-bottom: 1px solid black;
+}
+
+.color{
+    background:rgb(225, 222, 222);
+    
+}
