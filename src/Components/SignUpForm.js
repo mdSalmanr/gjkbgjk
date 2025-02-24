@@ -1,34 +1,39 @@
 import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
 import "./SignUp.css";
 import { useState } from "react";
 import { useRef } from "react";
 import { useContext } from "react";
 import { Auth } from "./Context/Context";
-import { useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom";
 import HomePage from "./HomePage";
+import { useDispatch } from "react-redux";
+import { AuthAction } from "./Store";
 
-const SignUpForm = ({setEmail}) => {
-    const Authctx = useContext(Auth);
-    const[login,setLogin] = useState(true);
-    const history = useHistory();
-    
-    const emailInputRef = useRef();
-    const passwordInputRef = useRef();
-    const SwitchAuth = ()=>{
-        setLogin((prevState)=>!prevState)
-    }
+
+const SignUpForm = ({ setEmail }) => {
+  const dispatch = useDispatch();
+  const Authctx = useContext(Auth);
+  const [login, setLogin] = useState(true);
+  const history = useHistory();
+
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
+  const SwitchAuth = () => {
+    setLogin((prevState) => !prevState);
+  };
 
   const FormSubmitHandler = (e) => {
     e.preventDefault();
     const enteredEmail = emailInputRef.current.value;
-    const enteredPassword =passwordInputRef.current.value; 
+    const enteredPassword = passwordInputRef.current.value;
     let url;
 
     if (login) {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAZp7ZxdFMWRYpSyvgpT1IBvO9LeORpmok";
     } else {
-       url =
+      url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAZp7ZxdFMWRYpSyvgpT1IBvO9LeORpmok";
     }
     fetch(url, {
@@ -48,7 +53,7 @@ const SignUpForm = ({setEmail}) => {
           return res.json();
         } else {
           return res.json().then((data) => {
-            console.log(data)
+            console.log(data);
             let errormessage = "Authantication Failed";
             if (data && data.error && data.error.message) {
               errormessage = data.error.message;
@@ -59,12 +64,11 @@ const SignUpForm = ({setEmail}) => {
         }
       })
       .then((data) => {
-        Authctx.login(data.idToken)
+        dispatch(AuthAction.login({token:data.idToken}));
+        //Authctx.login(data.idToken);
         console.log(data);
         setEmail(enteredEmail);
-        history.replace('/login');
-        
-         
+        history.replace("/login");
       })
       .catch((err) => {
         alert(err.message);
@@ -74,23 +78,16 @@ const SignUpForm = ({setEmail}) => {
 
   return (
     <div className="form1">
-      <form onSubmit={FormSubmitHandler} className="form2" >
-        <h2>{login ?"Login":"Sign Up"}</h2>
+      <form onSubmit={FormSubmitHandler} className="form2">
+        <h2>{login ? "Login" : "Sign Up"}</h2>
         <div>
-          <input
-            type="email"
-            placeholder="Email"
-            
-            
-            ref={emailInputRef}
-          />
+          <input type="email" placeholder="Email" ref={emailInputRef} />
         </div>
         <div>
           <input
             type="password"
             placeholder="Password"
             required
-           
             ref={passwordInputRef}
           />
         </div>
@@ -99,18 +96,18 @@ const SignUpForm = ({setEmail}) => {
             type="password"
             placeholder="Confirm Password"
             required
-            ref={passwordInputRef}            
+            ref={passwordInputRef}
           />
         </div>
 
-        
-        <button>{login? "Login" : "Create Account"}</button>
-        
+        <button>
+          {" "}
+          <Link to="/forgot"> Forgot Password </Link>{" "}
+        </button>
+        <button>{login ? "Login" : "Create Account"}</button>
       </form>
       <div>
-        <button onClick={SwitchAuth} >
-            Create Account ?Sign Up
-        </button>
+        <button onClick={SwitchAuth}>Create Account ?Sign Up</button>
       </div>
     </div>
   );
